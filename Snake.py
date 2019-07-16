@@ -126,12 +126,10 @@ if __name__ == "__main__":
     g = Game()
     s = Snake()
     clock = pygame.time.Clock()
+    obstacles = g.makeObstacles();
 
     while g.state:
         pygame.Surface.fill(window, BLACK)
-        if not g.obstacles:
-            g.draw_obstacles(g.makeObstacles())
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 g.state = False
@@ -153,10 +151,16 @@ if __name__ == "__main__":
                         s.update_direction("RIGHT")
                         #s.move()
         s.move()
+
         for box in s.boxes:
             pygame.draw.rect(window, s.color, box)
-        pygame.display.update()
-        clock.tick(5)
+        g.draw_obstacles(obstacles)
+        g.draw_border()
 
+        pygame.display.flip()
+
+
+
+        clock.tick(5)
 
 pygame.quit()
