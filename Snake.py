@@ -8,19 +8,24 @@ WHITE = [255, 255, 255]
 BLACK = [0, 0, 0]
 
 class Game:
+
     def __init__(self):
         self.state = True
+        self.obstacles = []
         self.draw_border()
+        self.snake = None
+
 
     @staticmethod
     def generateApples():
         print('generateApples()')
 
     @staticmethod
-    def makeObstacles():
-        obstacles = []
+    def makeObstacles(self):
         numObstacles = 5
+        obstacles=[]
         for i in range(0, numObstacles):
+
             numBoxes = 5
             randAlign = random.randint(0, 1)
             xStartingPos = random.randint(100, 400)
@@ -30,9 +35,6 @@ class Game:
                 xStartingPos += (10 - (xStartingPos % 10))
             if yStartingPos % 10 != 0:
                 yStartingPos += (10 - (yStartingPos % 10))
-
-            #  print ('xStartingPos[', i ,']: ', xStartingPos)
-            #  print ('yStartingPos[', i ,']: ', yStartingPos)
 
             if randAlign == 0:
                 alignment = "V"
@@ -66,11 +68,12 @@ class Game:
                 obstacles.pop(conf)
             conflicts.clear()
 
-        return obstacles
+        print(obstacles)
+        self.obstacles=obstacles
 
     @staticmethod
-    def draw_obstacles(obst):
-        for obstacle in obst:
+    def draw_obstacles(self):
+        for obstacle in self.obstacles:
             pygame.draw.rect(window, [255, 255, 100], obstacle)
 
     @staticmethod
@@ -85,11 +88,27 @@ class Game:
             pygame.draw.rect(window, WHITE, borderBox)
 
     @staticmethod
-    def collisionCheck():
-        print('collisionCheck()')
+    def collisionCheck(self):
+        for obstacle in self.obstacles:
+            #preObstacle = [obstacle[0]-10,obstacle[1]-10,10,10]
+            preObstacle = []
+            head = self.snake.head
+            if head[0] > obstacle[0]:
+                preObstacle = [obstacle[0]+10,obstacle[1],10,10]
+            if head[0] < obstacle[0]:
+                preObstacle = [obstacle[0]-10,obstacle[1],10,10]
+            if head[1] > obstacle[1]:
+                preObstacle = [obstacle[0],obstacle[1]+10,10,10]
+            if head[1] < obstacle[1]:
+                preObstacle = [obstacle[0],obstacle[1]-10,10,10]
+
+            if self.snake.head == preObstacle:
+                self.snake.moving = False
 
 class Snake:
+
     def __init__(self):
+
         self.boxes = [[WIDTH / 2, HEIGHT / 2, 10, 10], [(WIDTH / 2), HEIGHT / 2, 10, 10],
                       [(WIDTH / 2), HEIGHT / 2, 10, 10], [(WIDTH / 2), HEIGHT / 2, 10, 10]]
         self.distance = -10
@@ -101,6 +120,7 @@ class Snake:
         self.acceleration = 10
         self.score = 0
         self.sort_distance()
+        self.moving = True;
 
     def update_direction(self, p_direction):
         if p_direction == "RIGHT":
@@ -117,20 +137,21 @@ class Snake:
             self.x_direction = 0
 
     def move(self):
-        previousX = self.boxes[0][0]
-        previousY = self.boxes[0][1]
+        if self.moving:
+            previousX = self.boxes[0][0]
+            previousY = self.boxes[0][1]
 
-        self.boxes[0][0] += self.x_direction * self.acceleration
-        self.boxes[0][1] += self.y_direction * self.acceleration
+            self.boxes[0][0] += self.x_direction * self.acceleration
+            self.boxes[0][1] += self.y_direction * self.acceleration
 
-        for sBox in self.boxes:
-            if sBox == self.boxes[0]: continue
-            newPreviousX = sBox[0]
-            newPreviousY = sBox[1]
-            sBox[0] = previousX
-            sBox[1] = previousY
-            previousX = newPreviousX
-            previousY = newPreviousY
+            for sBox in self.boxes:
+                if sBox == self.boxes[0]: continue
+                newPreviousX = sBox[0]
+                newPreviousY = sBox[1]
+                sBox[0] = previousX
+                sBox[1] = previousY
+                previousX = newPreviousX
+                previousY = newPreviousY
 
     def sort_distance(self):
         for sBox in self.boxes:
@@ -141,8 +162,9 @@ if __name__ == "__main__":
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     g = Game()
     s = Snake()
+    g.snake = s
     clock = pygame.time.Clock()
-    obstacles = g.makeObstacles()
+    g.makeObstacles(g)
 
     while g.state:
         pygame.Surface.fill(window, BLACK)
@@ -166,11 +188,14 @@ if __name__ == "__main__":
                     if s.x_direction != -1:
                         s.update_direction("RIGHT")
                         break
+        g.draw_obstacles(g)
+        g.draw_border()
         s.move()
+        g.collisionCheck(g)
         for box in s.boxes:
             pygame.draw.rect(window, s.color, box)
-        g.draw_obstacles(obstacles)
-        g.draw_border()
+
+
         pygame.display.flip()
         clock.tick(7.5)
 
