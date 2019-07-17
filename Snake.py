@@ -220,6 +220,11 @@ class Snake:
         lastBox = self.boxes[len(self.boxes)-1]
         self.boxes.append([lastBox[0]+10,lastBox[1],10,10])
 
+    def checkSelfEating(self):
+        tail = self.boxes[1:]
+        if self.head in tail:
+            self.moving = False
+
 if __name__ == "__main__":
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -264,6 +269,7 @@ if __name__ == "__main__":
 
         g.collisionCheck(g)
         g.appleCheck(g)
+        s.checkSelfEating()
 
         s.move()
         s.draw_snake()
