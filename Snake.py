@@ -4,9 +4,9 @@ import random
 
 WIDTH = 500
 HEIGHT = 500
+SNAKE_COLOR = [255, 0, 255]
 WHITE = [255, 255, 255]
 BLACK = [0, 0, 0]
-
 
 class Game:
     def __init__(self):
@@ -20,26 +20,27 @@ class Game:
     @staticmethod
     def makeObstacles():
         obstacles = []
-        numObstacles = random.randint(5, 10)
+        numObstacles = 5
         for i in range(0, numObstacles):
-            numBoxes = random.randint(3, 6)
+            numBoxes = 5
             randAlign = random.randint(0, 1)
-            xStartingPos = random.randint(25, 476)
-            yStartingPos = random.randint(25, 476)
+            xStartingPos = random.randint(100, 400)
+            yStartingPos = random.randint(100, 400)
 
             if xStartingPos % 10 != 0:
                 xStartingPos += (10 - (xStartingPos % 10))
             if yStartingPos % 10 != 0:
                 yStartingPos += (10 - (yStartingPos % 10))
 
-            print ('xStartingPos[', i ,']: ', xStartingPos)
-            print ('yStartingPos[', i ,']: ', yStartingPos)
+            #  print ('xStartingPos[', i ,']: ', xStartingPos)
+            #  print ('yStartingPos[', i ,']: ', yStartingPos)
 
             if randAlign == 0:
                 alignment = "V"
             else:
                 alignment = "H"
 
+            # construct
             for j in range(0, numBoxes):
                 if alignment == "V":
                     obst = [xStartingPos, yStartingPos, 10, 10]
@@ -49,6 +50,20 @@ class Game:
                     obst = [xStartingPos, yStartingPos, 10, 10]
                     xStartingPos += 10
                     obstacles.append(obst)
+
+        # find conflicts and clear one of the participants
+        conflicts = []
+        for obst in range(0, len(obstacles)):
+            for obst2 in range(0, len(obstacles)):
+                if obst != obst2 and obstacles[obst][0] == obstacles[obst2][0] and obstacles[obst][1] == obstacles[obst2][1]:
+                    print('Obstacle', obst, 'at', obstacles[obst], 'conflicted with obstacle', obst2, 'at', obstacles[obst2], 'and was cleared along with the 2 surrounding obstacles at -1 and 1 indexes')
+                    for o in range(-1, 1): #  the surrounding 2 obstacles also
+                        obst =+ o
+                        conflicts.append(obst)
+
+        for conf in conflicts:
+            obstacles.pop(conf)
+
         return obstacles
 
     @staticmethod
@@ -75,10 +90,10 @@ class Snake:
     def __init__(self):
         self.boxes = [[WIDTH / 2, HEIGHT / 2, 10, 10], [(WIDTH / 2), HEIGHT / 2, 10, 10],
                       [(WIDTH / 2), HEIGHT / 2, 10, 10], [(WIDTH / 2), HEIGHT / 2, 10, 10]]
-        self.distance = -15
+        self.distance = -10
         self.head = self.boxes[0]
         self.length = len(self.boxes)
-        self.color = WHITE
+        self.color = SNAKE_COLOR
         self.x_direction = 1
         self.y_direction = 0
         self.acceleration = 10
@@ -119,7 +134,6 @@ class Snake:
         for sBox in self.boxes:
             sBox[0] += self.distance * (self.boxes.index(sBox) + 1)
 
-
 if __name__ == "__main__":
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -156,6 +170,6 @@ if __name__ == "__main__":
         g.draw_obstacles(obstacles)
         g.draw_border()
         pygame.display.flip()
-        clock.tick(5)
+        clock.tick(7.5)
 
 pygame.quit()
