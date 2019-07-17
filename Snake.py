@@ -15,7 +15,7 @@ class Game:
 
     @staticmethod
     def generateApples():
-        print('generateApples()')
+        print('generateApplez()')
 
     @staticmethod
     def makeObstacles():
