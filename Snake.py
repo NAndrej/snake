@@ -1,13 +1,11 @@
 import pygame
 import random
-import math;
 
 WIDTH = 500
 HEIGHT = 500
 SNAKE_COLOR = [255, 0, 255]
 WHITE = [255, 255, 255]
 BLACK = [0, 0, 0]
-
 
 class Game:
 
@@ -16,12 +14,15 @@ class Game:
         self.obstacles = []
         self.snake = None
         self.border = []
-        self.current_apple = ()
+
+    @staticmethod
+    def generateApples():
+        print('generateApples()')
 
     @staticmethod
     def makeObstacles(self):
         numObstacles = 5
-        obstacles = []
+        obstacles=[]
         for i in range(0, numObstacles):
 
             numBoxes = 5
@@ -55,13 +56,10 @@ class Game:
         while True:
             for obst in range(0, len(obstacles)):
                 for obst2 in range(0, len(obstacles)):
-                    if obst != obst2 and obstacles[obst][0] == obstacles[obst2][0] and obstacles[obst][1] == \
-                            obstacles[obst2][1]:
-                        print('Obstacle', obst, 'at', obstacles[obst], 'conflicted with obstacle', obst2, 'at',
-                              obstacles[obst2],
-                              'and was cleared along with the 2 surrounding obstacles at -1 and 1 indexes')
-                        for o in range(-1, 1):  # the surrounding 2 obstacles also
-                            obst = + o
+                    if obst != obst2 and obstacles[obst][0] == obstacles[obst2][0] and obstacles[obst][1] == obstacles[obst2][1]:
+                        print('Obstacle', obst, 'at', obstacles[obst], 'conflicted with obstacle', obst2, 'at', obstacles[obst2], 'and was cleared along with the 2 surrounding obstacles at -1 and 1 indexes')
+                        for o in range(-1, 1): #  the surrounding 2 obstacles also
+                            obst =+ o
                             conflicts.append(obst)
             if len(conflicts) < 1:
                 break
@@ -70,7 +68,7 @@ class Game:
             conflicts.clear()
 
         print(obstacles)
-        self.obstacles = obstacles
+        self.obstacles=obstacles
 
     @staticmethod
     def draw_obstacles(self):
@@ -95,26 +93,24 @@ class Game:
     @staticmethod
     def collisionCheck(self):
 
-        # OBSTACLE COLLIDER
         for obstacle in self.obstacles:
-            preObstacle = []
-            # LEFT collision
+            preObstacle=[]
+            #LEFT collision
             if self.snake.direction == "R":
-                preObstacle = [obstacle[0] - 10, obstacle[1], 10, 10]
-            # RIGHT collision
+                preObstacle = [obstacle[0]-10,obstacle[1],10,10]
+            #RIGHT collision
             if self.snake.direction == "L":
-                preObstacle = [obstacle[0] + 10, obstacle[1], 10, 10]
-            # UP collision
+                preObstacle = [obstacle[0]+10,obstacle[1],10,10]
+            #UP collision
             if self.snake.direction == "D":
-                preObstacle = [obstacle[0], obstacle[1] - 10, 10, 10]
-            # DOWN collision
+                preObstacle = [obstacle[0],obstacle[1]-10,10,10]
+            #DOWN collision
             if self.snake.direction == "U":
-                preObstacle = [obstacle[0], obstacle[1] + 10, 10, 10]
+                preObstacle = [obstacle[0],obstacle[1]+10,10,10]
 
             if self.snake.head == preObstacle or self.snake.head == obstacle:
                 self.snake.moving = False
 
-        # BORDER COLLIDER
         for borderBox in self.border:
 
             preBorderObstacle = []
@@ -134,24 +130,6 @@ class Game:
             if self.snake.head == preBorderObstacle or self.snake.head == borderBox:
                 self.snake.moving = False
 
-    @staticmethod
-    def draw_apple(window, apple):
-        window.blit(apple, g.current_apple)
-
-    @staticmethod
-    def appleCheck(self):
-
-        curr_apple = [self.current_apple[0], self.current_apple[1], 10, 10]
-        if (self.snake.head == curr_apple):
-            self.current_apple = self.generate_proper_position()
-
-    def generate_proper_position(self):
-        x = random.randint(20, 480)
-        y = random.randint(20, 480)
-        if x % 10 == 0 and y % 10 == 0 and [x,y,10,10] not in self.obstacles:
-            return x,y
-        else:
-            return self.generate_proper_position()
 
 
 class Snake:
@@ -171,6 +149,7 @@ class Snake:
         self.sort_distance()
         self.moving = True
         self.direction = "R"
+
 
     def update_direction(self, p_direction):
         if p_direction == "RIGHT":
@@ -215,22 +194,15 @@ class Snake:
         for box in self.boxes:
             pygame.draw.rect(window, self.color, box)
 
-
 if __name__ == "__main__":
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
-    apple = pygame.image.load('apple.png')
-    apple = pygame.transform.scale(apple, (10, 10))
     g = Game()
     s = Snake()
     g.snake = s
     g.makeObstacles(g)
     g.make_border(g)
     clock = pygame.time.Clock()
-
-    x_apple,y_apple = g.generate_proper_position()
-    g.current_apple = (x_apple, y_apple)
-
     while g.state:
         pygame.Surface.fill(window, BLACK)
         for event in pygame.event.get():
@@ -253,16 +225,12 @@ if __name__ == "__main__":
                     if s.x_direction != -1:
                         s.update_direction("RIGHT")
                         break
-
         g.draw_border(g)
         g.draw_obstacles(g)
-        g.draw_apple(window,apple)
-
         g.collisionCheck(g)
-        g.appleCheck(g)
-
         s.move()
         s.draw_snake()
+
 
         pygame.display.flip()
         clock.tick(7.5)
