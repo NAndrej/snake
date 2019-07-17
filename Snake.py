@@ -12,9 +12,8 @@ class Game:
     def __init__(self):
         self.state = True
         self.obstacles = []
-        self.draw_border()
         self.snake = None
-
+        self.border = []
 
     @staticmethod
     def generateApples():
@@ -77,18 +76,23 @@ class Game:
             pygame.draw.rect(window, [255, 255, 100], obstacle)
 
     @staticmethod
-    def draw_border():
+    def make_border(self):
         border = []
         for i in range(0, 491):
             border.append([i, 0, 10, 10])
             border.append([490, i, 10, 10])
             border.append([0, i, 10, 10])
             border.append([i, 490, 10, 10])
-        for borderBox in border:
+        self.border = border
+
+    @staticmethod
+    def draw_border(self):
+        for borderBox in self.border:
             pygame.draw.rect(window, WHITE, borderBox)
 
     @staticmethod
     def collisionCheck(self):
+
         for obstacle in self.obstacles:
             preObstacle=[]
             #LEFT collision
@@ -104,9 +108,28 @@ class Game:
             if self.snake.direction == "U":
                 preObstacle = [obstacle[0],obstacle[1]+10,10,10]
 
-
             if self.snake.head == preObstacle or self.snake.head == obstacle:
                 self.snake.moving = False
+
+        for borderBox in self.border:
+
+            preBorderObstacle = []
+            # LEFT collision
+            if self.snake.direction == "R":
+                preBorderObstacle = [borderBox[0] - 10, borderBox[1], 10, 10]
+            # RIGHT collision
+            if self.snake.direction == "L":
+                preBorderObstacle = [borderBox[0] + 10, borderBox[1], 10, 10]
+            # UP collision
+            if self.snake.direction == "D":
+                preBorderObstacle = [borderBox[0], borderBox[1] - 10, 10, 10]
+            # DOWN collision
+            if self.snake.direction == "U":
+                preBorderObstacle = [borderBox[0], borderBox[1] + 10, 10, 10]
+
+            if self.snake.head == preBorderObstacle or self.snake.head == borderBox:
+                self.snake.moving = False
+
 
 
 class Snake:
@@ -167,15 +190,19 @@ class Snake:
         for sBox in self.boxes:
             sBox[0] += self.distance * (self.boxes.index(sBox) + 1)
 
+    def draw_snake(self):
+        for box in self.boxes:
+            pygame.draw.rect(window, self.color, box)
+
 if __name__ == "__main__":
     pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     g = Game()
     s = Snake()
     g.snake = s
-    clock = pygame.time.Clock()
     g.makeObstacles(g)
-
+    g.make_border(g)
+    clock = pygame.time.Clock()
     while g.state:
         pygame.Surface.fill(window, BLACK)
         for event in pygame.event.get():
@@ -198,12 +225,11 @@ if __name__ == "__main__":
                     if s.x_direction != -1:
                         s.update_direction("RIGHT")
                         break
+        g.draw_border(g)
         g.draw_obstacles(g)
-        g.draw_border()
-        s.move()
         g.collisionCheck(g)
-        for box in s.boxes:
-            pygame.draw.rect(window, s.color, box)
+        s.move()
+        s.draw_snake()
 
 
         pygame.display.flip()
