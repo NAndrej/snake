@@ -144,6 +144,7 @@ class Game:
         curr_apple = [self.current_apple[0], self.current_apple[1], 10, 10]
         if (self.snake.head == curr_apple):
             self.current_apple = self.generate_proper_position()
+            self.snake.enlarge()
 
     def generate_proper_position(self):
         x = random.randint(20, 480)
@@ -215,6 +216,9 @@ class Snake:
         for box in self.boxes:
             pygame.draw.rect(window, self.color, box)
 
+    def enlarge(self):
+        lastBox = self.boxes[len(self.boxes)-1]
+        self.boxes.append([lastBox[0]+10,lastBox[1],10,10])
 
 if __name__ == "__main__":
     pygame.init()
