@@ -90,20 +90,24 @@ class Game:
     @staticmethod
     def collisionCheck(self):
         for obstacle in self.obstacles:
-            #preObstacle = [obstacle[0]-10,obstacle[1]-10,10,10]
-            preObstacle = []
-            head = self.snake.head
-            if head[0] > obstacle[0]:
-                preObstacle = [obstacle[0]+10,obstacle[1],10,10]
-            if head[0] < obstacle[0]:
+            preObstacle=[]
+            #LEFT collision
+            if self.snake.direction == "R":
                 preObstacle = [obstacle[0]-10,obstacle[1],10,10]
-            if head[1] > obstacle[1]:
-                preObstacle = [obstacle[0],obstacle[1]+10,10,10]
-            if head[1] < obstacle[1]:
+            #RIGHT collision
+            if self.snake.direction == "L":
+                preObstacle = [obstacle[0]+10,obstacle[1],10,10]
+            #UP collision
+            if self.snake.direction == "D":
                 preObstacle = [obstacle[0],obstacle[1]-10,10,10]
+            #DOWN collision
+            if self.snake.direction == "U":
+                preObstacle = [obstacle[0],obstacle[1]+10,10,10]
 
-            if self.snake.head == preObstacle:
+
+            if self.snake.head == preObstacle or self.snake.head == obstacle:
                 self.snake.moving = False
+
 
 class Snake:
 
@@ -120,21 +124,27 @@ class Snake:
         self.acceleration = 10
         self.score = 0
         self.sort_distance()
-        self.moving = True;
+        self.moving = True
+        self.direction = "R"
+
 
     def update_direction(self, p_direction):
         if p_direction == "RIGHT":
             self.x_direction = 1
             self.y_direction = 0
+            self.direction = "R"
         if p_direction == "LEFT":
             self.x_direction = -1
             self.y_direction = 0
+            self.direction = "L"
         if p_direction == "UP":
             self.y_direction = -1
             self.x_direction = 0
+            self.direction = "U"
         if p_direction == "DOWN":
             self.y_direction = 1
             self.x_direction = 0
+            self.direction = "D"
 
     def move(self):
         if self.moving:
